@@ -1,5 +1,6 @@
-from time import time
 from rich.console import Console
+from time import time
+import datetime
 console = Console()
 def send_Msg(msg):
     if isinstance(msg, BaseMsg):
@@ -19,28 +20,46 @@ class BaseMsg:
     @property
     def data(self):
         return self._data
-    
+
     def __str__(self):
         return self._data # BaseMsg-specific
     
     def __len__(self):
-        ... # erase this line and implement method
-    
+        return len(self._data)
+
     def __eq__(self, other):
-        ... # erase this line and implement method
-    
+        return str(self) == str(other)
+
+
     def __add__(self, other):
-        ... # erase this line and implement method
+        if isinstance(other, BaseMsg):
+            new_data = self._data + other._data
+        else:
+            new_data = self._data + str(other)
+        return self.__class__(new_data)  # ensures same type as self
+
+
 
 
 class LogMsg(BaseMsg):
     def __init__(self, data):
         super().__init__(data)
-        self._timestamp: int = ... # erase dots and assign value to use it in __str__()
+        self._timestamp: int = time() # erase dots and assign value to use it in __str__()
+    def __str__(self):
+        return f'[{datetime.datetime.fromtimestamp(self._timestamp)}] {self._data}' # BaseMsg-specific
+    @property
+    def style(self):
+        return 'on yellow' # BaseMsg-specific
 
 
 class WarnMsg(LogMsg):
-    ... # erase this line and reimplement specified methods
+    def __init__(self,data):
+        super().__init__(data)
+    def __str__(self):
+        return f'[!WARN] [{datetime.datetime.fromtimestamp(self._timestamp)}] {self._data}'
+    @property
+    def style(self):
+        return 'white on red' # BaseMsg-specific
 
 
 if __name__ == '__main__':
